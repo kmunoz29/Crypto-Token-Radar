@@ -6,7 +6,7 @@ An on-chain risk evaluation dashboard designed to analyze token security, monito
 
 ## Overview
 
-Crypto Token Radar provides a transparent security layer for interacting with new and volatile cryptocurrency tokens. By pulling contract data and liquidity metrics directly from decentralized networks, the application evaluates risk factors and categorizes tokens into straightforward risk tiers to help users make informed decisions.
+Solana Token Radar provides a transparent security layer for interacting with new and volatile cryptocurrency tokens. By pulling contract data and liquidity metrics directly from decentralized networks, the application evaluates risk factors and categorizes tokens into straightforward risk tiers to help users make informed decisions.
 
 ### Core Features
 
