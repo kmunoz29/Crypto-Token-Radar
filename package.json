@@ -1,0 +1,24 @@
+{
+  "name": "crypto-token-radar",
+  "version": "1.0.0",
+  "description": "Real-time Solana Token Discovery, Holder Clustering & Risk Radar",
+  "main": "scanner.js",
+  "scripts": {
+    "start": "node scanner.js",
+    "test-risk": "node test-holder-risk.js",
+    "test-score": "node test-score.js"
+  },
+  "keywords": [
+    "solana",
+    "crypto-token-radar",
+    "risk-analysis"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "ws": "^8.21.3"
+  }
+}

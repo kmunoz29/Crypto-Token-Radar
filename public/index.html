@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crypto Token Radar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090b0e;
+      --panel: #0e1217;
+      --border: #1c222c;
+      --border-subtle: #161b24;
+      --hover: #141922;
+      --text: #e1e7ed;
+      --text-muted: #74808e;
+      --text-dark: #4b5563;
+      
+      --pass: #2ea043;
+      --pass-bg: rgba(46, 160, 67, 0.1);
+      --pass-border: rgba(46, 160, 67, 0.28);
+
+      --wait: #d29922;
+      --wait-bg: rgba(210, 153, 34, 0.1);
+      --wait-border: rgba(210, 153, 34, 0.28);
+
+      --avoid: #f85149;
+      --avoid-bg: rgba(248, 81, 73, 0.1);
+      --avoid-border: rgba(248, 81, 73, 0.28);
+
+      --accent: #58a6ff;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Inter', -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 13px;
+      line-height: 1.4;
+      padding: 18px 24px;
+      min-height: 100vh;
+    }
+
+    /* Top Control Bar */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-title {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #fff;
+      font-family: var(--mono);
+    }
+
+    .live-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--pass);
+      background: var(--pass-bg);
+      border: 1px solid var(--pass-border);
+      padding: 2px 8px;
+      border-radius: 3px;
+    }
+
+    .live-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--pass);
+    }
+
+    .stats-tray {
+      display: flex;
+      gap: 16px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .stats-tray span b {
+      color: #fff;
+    }
+
+    /* Filter Controls */
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+    }
+
+    .tab-btn {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.1s ease;
+    }
+
+    .tab-btn:hover {
+      border-color: #303744;
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      background: #151b24;
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .tab-count {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 10px;
+    }
+
+    /* Table Structure */
+    .table-frame {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    thead th {
+      background: #0b0e12;
+      color: var(--text-muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border-subtle);
+      cursor: pointer;
+      transition: background 0.1s ease;
+    }
+
+    tbody tr:hover {
+      background: var(--hover);
+    }
+
+    tbody td {
+      padding: 9px 12px;
+      vertical-align: middle;
+    }
+
+    .mono { font-family: var(--mono); font-size: 12px; }
+    .subtext { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+    /* Clean Badges (No Emojis) */
+    .badge {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.2px;
+    }
+
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+    }
+
+    .badge-GOOD { color: var(--pass); background: var(--pass-bg); border: 1px solid var(--pass-border); }
+    .badge-GOOD .dot { background: var(--pass); }
+
+    .badge-MAYBE { color: var(--wait); background: var(--wait-bg); border: 1px solid var(--wait-border); }
+    .badge-MAYBE .dot { background: var(--wait); }
+
+    .badge-BAD { color: var(--avoid); background: var(--avoid-bg); border: 1px solid var(--avoid-border); }
+    .badge-BAD .dot { background: var(--avoid); }
+
+    .val-danger { color: var(--avoid); font-weight: 600; }
+    .val-pass { color: var(--pass); font-weight: 600; }
+    .val-warn { color: var(--wait); font-weight: 600; }
+
+    /* Action Links */
+    .link-btn {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 2px 6px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: #090c10;
+      transition: all 0.1s;
+    }
+
+    .link-btn:hover {
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* Inspection Slide-Out Panel */
+    .inspector {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 440px;
+      background: #0e1217;
+      border-left: 1px solid var(--border);
+      box-shadow: -8px 0 24px rgba(0, 0, 0, 0.6);
+      transform: translateX(100%);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .inspector.open { transform: translateX(0); }
+
+    .inspector-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .insp-group {
+      margin-bottom: 16px;
+    }
+
+    .insp-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .insp-card {
+      background: #080a0e;
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .insp-signals {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .insp-signals li {
+      font-size: 12px;
+      color: #c9d1d9;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-title">CRYPTO TOKEN RADAR</div>
+      <div class="live-indicator">
+        <div class="live-dot"></div>
+        ACTIVE
+      </div>
+    </div>
+
+    <div class="stats-tray">
+      <span>Scanned: <b id="stat-total">0</b></span>
+      <span>Pass (Buy): <b id="stat-good" style="color: var(--pass);">0</b></span>
+      <span>Wait (Watch): <b id="stat-maybe" style="color: var(--wait);">0</b></span>
+      <span>Avoid (Reject): <b id="stat-bad" style="color: var(--avoid);">0</b></span>
+    </div>
+  </header>
+
+  <div class="controls-row">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="setFilter('ALL', this)">
+        ALL <span class="tab-count" id="count-all">0</span>
+      </button>
+      <button class="tab-btn" onclick="setFilter('GOOD', this)">
+        PASS (BUY) <span class="tab-count" id="count-good">0</span>
+      </button>
+      <button class="tab-btn" onclick="setFilter('MAYBE', this)">
+        WAIT (WATCH) <span class="tab-count" id="count-maybe">0</span>
+      </button>
+      <button class="tab-btn" onclick="setFilter('BAD', this)">
+        AVOID (REJECT) <span class="tab-count" id="count-bad">0</span>
+      </button>
+    </div>
+    <div class="subtext mono">Click any row to view forensic audit breakdown</div>
+  </div>
+
+  <div class="table-frame">
+    <table>
+      <thead>
+        <tr>
+          <th>Asset / Contract</th>
+          <th>Decision Verdict</th>
+          <th>Score</th>
+          <th>Top 10 Dominance</th>
+          <th>Bundler / Dev Allocation</th>
+          <th>Momentum (30s)</th>
+          <th>Execution</th>
+        </tr>
+      </thead>
+      <tbody id="token-table-body"></tbody>
+    </table>
+  </div>
+
+  <!-- Slide-Out Forensic Audit Inspector -->
+  <div id="inspector" class="inspector">
+    <div class="inspector-head">
+      <div>
+        <h3 id="insp-name" style="color: #fff; font-size: 14px; font-weight: 600;">Token Inspector</h3>
+        <div id="insp-mint" class="subtext mono"></div>
+      </div>
+      <button class="close-btn" onclick="closeInspector()">&times;</button>
+    </div>
+
+    <div class="insp-group">
+      <div class="insp-title">System Recommendation</div>
+      <div id="insp-verdict" class="insp-card"></div>
+    </div>
+
+    <div class="insp-group">
+      <div class="insp-title">On-Chain Cluster Forensics</div>
+      <div id="insp-holder" class="insp-card"></div>
+    </div>
+
+    <div class="insp-group">
+      <div class="insp-title">Triggered Signals</div>
+      <ul id="insp-signals" class="insp-signals"></ul>
+    </div>
+
+    <div style="margin-top: auto; display: flex; gap: 8px;">
+      <a id="insp-dex" class="link-btn" style="flex: 1; text-align: center; padding: 7px;" target="_blank">DexScreener</a>
+      <a id="insp-sol" class="link-btn" style="flex: 1; text-align: center; padding: 7px;" target="_blank">Solscan</a>
+    </div>
+  </div>
+
+  <script>
+    const tableBody = document.getElementById("token-table-body");
+    const tokenMap = new Map();
+    let currentFilter = "ALL";
+    const MAX_ROWS = 60;
+
+    const ws = new WebSocket(`ws://${window.location.host}`);
+
+    ws.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+      if (msg.type === "TOKEN_LAUNCH") handleLaunch(msg.payload);
+      else if (msg.type === "HOLDER_AUDIT") handleAudit(msg.payload);
+      else if (msg.type === "PRICE_CHECK") handlePrice(msg.payload);
+    };
+
+    function classify(score, status) {
+      if (status === "REJECT" || score <= 35) {
+        return { category: "BAD", label: "AVOID", advice: "Critical concentration or bundler cluster detected. Capital risk elevated." };
+      }
+      if (score >= 70 && status === "PASS") {
+        return { category: "GOOD", label: "PASS", advice: "Distributed supply with healthy deployer profile. Viable candidate." };
+      }
+      return { category: "MAYBE", label: "WAIT", advice: "Awaiting holder indexing or initial price discovery confirmation." };
+    }
+
+    function handleLaunch(data) {
+      if (tokenMap.has(data.mint)) return;
+
+      const classification = classify(data.score, "UNKNOWN");
+      const record = {
+        ...data,
+        status: "INDEXING",
+        top10Percent: null,
+        bundlerPercent: null,
+        devPercent: null,
+        returnPercent: null,
+        checkpoint: null,
+        classification
+      };
+
+      tokenMap.set(data.mint, record);
+      render();
+    }
+
+    function handleAudit(data) {
+      const r = tokenMap.get(data.mint);
+      if (!r) return;
+
+      r.top10Percent = data.top10Percent;
+      r.bundlerPercent = data.bundlerPercent;
+      r.devPercent = data.devPercent;
+      r.status = data.status;
+      r.score = data.score;
+      r.signals = data.signals || r.signals;
+      r.classification = classify(data.score, data.status);
+
+      render();
+    }
+
+    function handlePrice(data) {
+      const r = tokenMap.get(data.mint);
+      if (!r) return;
+
+      r.returnPercent = data.returnPercent;
+      r.checkpoint = data.checkpoint;
+      r.score = data.score;
+      r.signals = data.signals || r.signals;
+      r.classification = classify(data.score, r.status);
+
+      render();
+    }
+
+    function render() {
+      const sorted = Array.from(tokenMap.values()).sort((a, b) => {
+        const rank = { GOOD: 1, MAYBE: 2, BAD: 3 };
+        if (rank[a.classification.category] !== rank[b.classification.category]) {
+          return rank[a.classification.category] - rank[b.classification.category];
+        }
+        return b.score - a.score;
+      });
+
+      let good = 0, maybe = 0, bad = 0;
+      sorted.forEach(r => {
+        if (r.classification.category === "GOOD") good++;
+        else if (r.classification.category === "MAYBE") maybe++;
+        else if (r.classification.category === "BAD") bad++;
+      });
+
+      document.getElementById("stat-total").textContent = sorted.length;
+      document.getElementById("stat-good").textContent = good;
+      document.getElementById("stat-maybe").textContent = maybe;
+      document.getElementById("stat-bad").textContent = bad;
+
+      document.getElementById("count-all").textContent = sorted.length;
+      document.getElementById("count-good").textContent = good;
+      document.getElementById("count-maybe").textContent = maybe;
+      document.getElementById("count-bad").textContent = bad;
+
+      tableBody.innerHTML = "";
+
+      sorted.forEach(r => {
+        if (currentFilter !== "ALL" && r.classification.category !== currentFilter) return;
+
+        const tr = document.createElement("tr");
+        tr.onclick = () => openInspector(r.mint);
+
+        const top10 = r.top10Percent !== null
+          ? `<span class="${r.top10Percent > 65 ? 'val-danger' : 'val-pass'}">${r.top10Percent.toFixed(1)}%</span>`
+          : '<span class="subtext">indexing...</span>';
+
+        const bundle = r.bundlerPercent !== null
+          ? `<span class="${r.bundlerPercent > 8 ? 'val-danger' : ''}">${r.bundlerPercent.toFixed(1)}%</span> / ${(r.devPercent || 0).toFixed(1)}%`
+          : '<span class="subtext">indexing...</span>';
+
+        let momentum = '<span class="subtext">0.00%</span>';
+        if (r.returnPercent !== null) {
+          const sign = r.returnPercent >= 0 ? "+" : "";
+          const color = r.returnPercent >= 0 ? "val-pass" : "val-danger";
+          momentum = `<span class="${color}">${sign}${r.returnPercent.toFixed(2)}%</span> <span class="subtext">(${r.checkpoint})</span>`;
+        }
+
+        tr.innerHTML = `
+          <td>
+            <div style="font-weight: 600; color: #fff;">$${escape(r.symbol)}</div>
+            <div class="subtext mono">${escape(r.name)} · ${r.mint.slice(0, 4)}...${r.mint.slice(-4)}</div>
+          </td>
+          <td>
+            <span class="badge badge-${r.classification.category}">
+              <span class="dot"></span>
+              ${r.classification.label}
+            </span>
+          </td>
+          <td>
+            <span class="mono" style="font-weight: 700; color: #fff;">${r.score}</span>
+            <span class="subtext">/100</span>
+          </td>
+          <td class="mono">${top10}</td>
+          <td class="mono">${bundle}</td>
+          <td class="mono">${momentum}</td>
+          <td onclick="event.stopPropagation()">
+            <a href="https://dexscreener.com/solana/${r.mint}" target="_blank" rel="noopener" class="link-btn">DEX</a>
+            <a href="https://solscan.io/token/${r.mint}" target="_blank" rel="noopener" class="link-btn">SOL</a>
+          </td>
+        `;
+
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function setFilter(type, btn) {
+      currentFilter = type;
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      render();
+    }
+
+    function openInspector(mint) {
+      const r = tokenMap.get(mint);
+      if (!r) return;
+
+      document.getElementById("insp-name").textContent = `${r.name} ($${r.symbol})`;
+      document.getElementById("insp-mint").textContent = `Mint: ${r.mint}`;
+
+      document.getElementById("insp-verdict").innerHTML = `
+        <div><strong>Verdict:</strong> <span class="badge badge-${r.classification.category}"><span class="dot"></span>${r.classification.label}</span></div>
+        <div style="margin-top: 4px; color: var(--text-muted);">${r.classification.advice}</div>
+        <div style="margin-top: 4px;"><strong>Composite Safety Score:</strong> ${r.score}/100</div>
+      `;
+
+      document.getElementById("insp-holder").innerHTML = `
+        <div>Top 10 Wallets: <b>${r.top10Percent !== null ? r.top10Percent.toFixed(2) + '%' : 'Pending indexing...'}</b></div>
+        <div>Bundler Concentration: <b>${r.bundlerPercent !== null ? r.bundlerPercent.toFixed(2) + '%' : 'Pending indexing...'}</b></div>
+        <div>Developer Allocation: <b>${r.devPercent !== null ? r.devPercent.toFixed(2) + '%' : 'Pending indexing...'}</b></div>
+        <div>Deployer Launches: <b>${r.creatorTotal || 1} total (${r.creatorRecent || 1} in last 10m)</b></div>
+      `;
+
+      const cleanSignals = (r.signals || ["Analyzing signals..."]).map(s => s.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F]|\uD83D[\uDE80-\uDEFF]|\u2600-\u2B55/g, '').trim());
+      const sigList = document.getElementById("insp-signals");
+      sigList.innerHTML = cleanSignals.map(s => `<li>- ${escape(s)}</li>`).join("");
+
+      document.getElementById("insp-dex").href = `https://dexscreener.com/solana/${r.mint}`;
+      document.getElementById("insp-sol").href = `https://solscan.io/token/${r.mint}`;
+
+      document.getElementById("inspector").classList.add("open");
+    }
+
+    function closeInspector() {
+      document.getElementById("inspector").classList.remove("open");
+    }
+
+    function escape(str) {
+      return String(str || '').replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+  </script>
+</body>
+</html>

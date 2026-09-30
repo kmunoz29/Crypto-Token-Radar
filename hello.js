@@ -1,0 +1,1 @@
+console.log("Crypto Token Radar is working!");
