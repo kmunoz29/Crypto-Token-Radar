@@ -1,4 +1,4 @@
-# Crypto Token Radar
+# Solana Token Radar
 
 An on-chain risk evaluation dashboard designed to analyze token security, monitor liquidity stability, and identify holder concentration vulnerabilities in real time.
 
